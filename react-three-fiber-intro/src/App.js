@@ -1,7 +1,13 @@
 import logo from './logo.svg';
 import './App.css';
-import { Canvas, useFrame, useThree, extend } from 'react-three-fiber';
-import { useRef } from 'react';
+import {
+  Canvas,
+  useFrame,
+  useThree,
+  extend,
+  useLoader
+} from 'react-three-fiber';
+import { useRef, Suspense } from 'react';
 import {
   OrbitControls
 } from 'three/examples/jsm/controls/OrbitControls';
@@ -14,10 +20,16 @@ const Orbit = () => {
   return (
     <orbitControls args={[camera, gl.domElement]} />
   );
-}
+};
 
 const Box = props => {
   const ref = useRef();
+  // texture를 쓰기위해선 useLoader라는 훅을 써야한다.
+  // useLoader에는 차례대로 THREE의 TextureLoader, 사진 위치가 인자로 들어간다.
+  const texture = useLoader(
+    THREE.TextureLoader,
+    '/wood.jpg'
+  );
   useFrame(state => {
     // *useFrame안에는 state 함수를 넣으면 안된다.
     ref.current.rotation.x += 0.01;
@@ -27,49 +39,42 @@ const Box = props => {
     <mesh
       ref={ref}
       {...props}
-      // castShadow로 그림자를 생성하고
       castShadow
-      // receiveShadow로 그림자를 받음
       // receiveShadow
     >
-      <boxBufferGeometry />
+      <sphereBufferGeometry />
       <meshPhysicalMaterial
-        color='white'
-        // material에 fog 속성을 false로 바꾸면 fog의 영향을 안 받는다.
-        // fog={false}
-
-        // transparent로 투명도를 줄 것인지 결정할 수 있고 opacity로 조절할 수 있다.
-        opacity={0.5}
-        transparent
-
-        // visible로 보일지 말지 정해줄 수 있다.
-        // visible={false}
-
-        // wireframe은 geometry의 wireframe을 보여준다.
-        // wireframe
-
-        // metalness는 메탈처럼 보이는 정도를 나타낸다. 기본값: 0.0
-        // metalness={1}
-
-        // roughness는 표면 거칠기 정도를 나타낸다. 기본값: 1
-        roughness={0}
-
-        // clearcoat는 표면위에 얇고 반투명한 층이 있는 것처럼 보이게 만든다. 기본값: 0
-        clearcoat={1}
-
-        // transmission은 투과도를 나타낸다. 기본값: 0
-        // transmission이 반영되기 위해선 transparent가 true여야 한다.
-        // transmission을 활용하여 유리재질을 만들 수 있다.
-        transmission={0.5}
-
-        // reflectivity는 반사 정도를 나타낸다. 기본값: 0.5
-        reflectivity={1}
-
-        side={THREE.DoubleSide}
+        map={texture}
       />
     </mesh>
   );
-}
+};
+
+const Background = props => {
+  const texture = useLoader(
+    THREE.TextureLoader,
+    '/autoshop.jpg'
+  );
+
+  // fromEquirectangularTexture()에 필요한 WebGLRenderer를 가지고 옴
+  const { gl } = useThree();
+
+  // WebGLCubeRenderTarget을 이용해서 스카이맵을 만들 수 있다.
+  const formatted = new THREE.WebGLCubeRenderTarget(
+    texture.image.height
+  // fromEquirectangularTexture는 정방형 파노라마를 큐브맵 형식으로 변환할 때 사용한다. 
+  ).fromEquirectangularTexture(gl, texture);
+
+  return (
+    // primitive는 R3F에서 가장 기본적인 Object와도 같은 놈이다.
+    // object라는 속성을 가지고 있는데 안에 텍스쳐를 넣을 수 있다.
+    // 이것을 Scene의 background 속성으로 넣기 위해선 attach를 이용해야 한다.
+    <primitive
+      attach="background"
+      object={formatted.texture}
+    />
+  );
+};
 
 const Floor = props => {
   return(
@@ -78,7 +83,7 @@ const Floor = props => {
       <meshPhysicalMaterial />
     </mesh>
   );
-}
+};
 
 const Bulb = props => {
   return(
@@ -88,7 +93,7 @@ const Bulb = props => {
       <meshPhongMaterial emissive='yellow' />
     </mesh>
   );
-}
+};
 
 function App() {
   return (
@@ -97,15 +102,23 @@ function App() {
         // shadows설정을 해줘야 그림자가 생김
         shadows
         style={{ background: 'black' }}
-        camera={{ position: [1, 5, 1] }}
+        camera={{ position: [3, 3, 3] }}
       >
-        {/* 각각의 인자는 [color, near, far] 이다. */}
-        <fog attach='fog' args={['white', 1, 10]} />
         <ambientLight intensity={0.2} />
         <Bulb position={[0, 3, 0]} />
         <Orbit />
         <axesHelper args={[5]} />
-        <Box position={[0, 1, 0]} />
+        <Suspense fallback={null}
+        // Suspense는 기본적으로 구성요소를 렌더링하기 전에
+        // 모든 비동기 동작이 발생할 때까지 기다린다.
+        // 텍스쳐가 로드될 때까지 기다리고 박스를 렌더링함
+        // 현재 버전에선 없어도 무방함
+        >
+          <Box position={[0, 1, 0]} />
+        </Suspense>
+        <Suspense fallback={null}>
+          <Background />
+        </Suspense>
         <Floor position={[0, -0.5, 0]} />
       </Canvas>
     </div>
