@@ -6,14 +6,11 @@ import {
   OrbitControls
 } from 'three/examples/jsm/controls/OrbitControls';
 
-// OrbitControls를 R3F로 확장시켜서 JSX에서 쓸 수 있게 해줘야 된다.
 extend({ OrbitControls });
 
 const Orbit = () => {
-  // 컴포넌트에 three.js의 특정한 것을 알려줘야할 때 useThree 등등을 훅을 쓸 수 있다.
   const { camera, gl } = useThree();
   return (
-    // *소문자로 시작해야함
     <orbitControls args={[camera, gl.domElement]} />
   );
 }
@@ -27,13 +24,34 @@ const Box = props => {
   })
   return (
     <mesh
-      ref={ref} 
-      // Box컴포넌트의 props를 통해 mesh의 props를 전달할 수 있음
-      // 객체형태로 받기에 스프레드 연산자를 사용하여 요소만 받음
+      ref={ref}
       {...props}
+      // castShadow로 그림자를 생성하고
+      castShadow
+      // receiveShadow로 그림자를 받음
+      receiveShadow
     >
       <boxBufferGeometry />
-      <meshBasicMaterial color='blue' />
+      <meshPhysicalMaterial color='blue' />
+    </mesh>
+  );
+}
+
+const Floor = props => {
+  return(
+    <mesh {...props} receiveShadow >
+      <boxBufferGeometry args={[20, 1, 10]} />
+      <meshPhysicalMaterial />
+    </mesh>
+  );
+}
+
+const Bulb = props => {
+  return(
+    <mesh {...props}>
+      <pointLight castShadow />
+      <sphereBufferGeometry args={[0.2, 20, 20]} />
+      <meshPhongMaterial emissive='yellow' />
     </mesh>
   );
 }
@@ -42,15 +60,17 @@ function App() {
   return (
     <div style={{ height: '100vh', width: '100vw' }}>
       <Canvas
+        // shadows설정을 해줘야 그림자가 생김
+        shadows
         style={{ background: 'black' }}
         camera={{ position: [3, 3, 3] }}
       >
-        <Box position={[-1, 1, 2]} />
+        <ambientLight intensity={0.2} />
+        <Bulb position={[0, 3, 0]} />
         <Orbit />
-
-        <axesHelper args={[5]}
-        // red: X Axis, green: Y Axis, blue: Z Axis
-        />
+        <axesHelper args={[5]} />
+        <Box position={[-1, 1, 2]} />
+        <Floor position={[0, -0.5, 0]} />
       </Canvas>
     </div>
   );
