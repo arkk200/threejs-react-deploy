@@ -1,6 +1,8 @@
 import './App.css';
 import { Canvas } from 'react-three-fiber';
+import { Physics } from '@react-three/cannon';
 import { Suspense } from 'react';
+
 import Orbit from './components/Orbit';
 import Box from './components/Box';
 import Background from './components/Background';
@@ -21,19 +23,22 @@ function App() {
         <ambientLight intensity={0.2} />
         <Orbit />
         <axesHelper args={[5]} />
-        <Dragable>
-          <Bulb position={[0, 3, 0]} />
+        {/* Physics를 사용하려면 mesh에 physics 속성을 추가해야한다. */}
+        <Physics>
+          <Dragable>
+            <Bulb position={[0, 3, 0]} />
+            <Suspense fallback={null}>
+              <Box position={[-4, 1, 0]} />
+            </Suspense>
+            <Suspense fallback={null}>
+              <Box position={[4, 1, 0]} />
+            </Suspense>
+          </Dragable>
           <Suspense fallback={null}>
-            <Box position={[-4, 1, 0]} />
+            <Background />
           </Suspense>
-          <Suspense fallback={null}>
-            <Box position={[4, 1, 0]} />
-          </Suspense>
-        </Dragable>
-        <Suspense fallback={null}>
-          <Background />
-        </Suspense>
-        <Floor position={[0, -0.5, 0]} />
+          <Floor position={[0, -0.5, 0]} />
+        </Physics>
       </Canvas>
     </div>
   );

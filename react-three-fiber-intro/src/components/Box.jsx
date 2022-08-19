@@ -1,23 +1,19 @@
 import { useRef } from 'react';
 import { useLoader, useFrame } from 'react-three-fiber';
 import * as THREE from 'three';
+import { useBox } from "@react-three/cannon";
 
 const Box = props => {
-    const ref = useRef();
+    // mass, 질량을 추가하면 밑으로 떨어짐
+    const [ref, api] = useBox(() => ({mass: 1, ...props}));
     // texture를 쓰기위해선 useLoader라는 훅을 써야한다.
     // useLoader에는 차례대로 THREE의 TextureLoader, 사진 위치가 인자로 들어간다.
     const texture = useLoader(
         THREE.TextureLoader,
         '/wood.jpg'
     );
-    useFrame(state => {
-        // *useFrame안에는 state 함수를 넣으면 안된다.
-        ref.current.rotation.x += 0.01;
-        ref.current.rotation.y += 0.01;
-    });
 
     const handlePointerDown = e => {
-        console.log(e);
         e.object.active = true;
         // 만약 기억하고 있던 오브젝트가 또 눌렸다면 또 크기를 늘릴 필요 없으니 return;
         if (e.object == window.activeMesh) return;
@@ -52,6 +48,7 @@ const Box = props => {
     return (
         <mesh
             ref={ref}
+            api={api}
             {...props}
             castShadow
             onPointerDown={handlePointerDown}

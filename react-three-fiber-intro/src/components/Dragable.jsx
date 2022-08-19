@@ -27,6 +27,20 @@ const Dragable = props => {
         controlsRef.current.addEventListener('hoveroff', e => {
             scene.orbitControls.enabled = true;
         });
+        controlsRef.current.addEventListener('dragstart', e => {
+            // 드래그를 시작했을 때 질량을 0으로 만듦
+            e.object.api.mass.set(0);
+        });
+        controlsRef.current.addEventListener('dragend', e => {
+            // 드래그를 끝냈을 때 질량을 1로 만듦
+            e.object.api.mass.set(1);
+        });
+        controlsRef.current.addEventListener('drag', e => {
+            // physics의 위치를 오브젝트의 위치에서 복사해옴
+            e.object.api.position.copy(e.object.position);
+            // 드래그하고 있을 땐 속도를 0으로 줄임 (가속하는 버그를 없앰)
+            e.object.api.velocity.set(0, 0, 0);
+        });
     }, [children]);
     return (
         <group ref={groupRef}>
