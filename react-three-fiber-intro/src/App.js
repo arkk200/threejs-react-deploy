@@ -34,15 +34,51 @@ const Box = props => {
     // *useFrame안에는 state 함수를 넣으면 안된다.
     ref.current.rotation.x += 0.01;
     ref.current.rotation.y += 0.01;
-  })
+  });
+
+  const handlePointerDown = e => {
+    console.log(e);
+    e.object.active = true;
+    // 만약 기억하고 있던 오브젝트가 또 눌렸다면 또 크기를 늘릴 필요 없으니 return;
+    if(e.object == window.activeMesh) return;
+    // 만약 클릭 이벤트가 발생됐고 window.activeMesh에 오브젝트가 있다면
+    if (window.activeMesh) {
+      // 기억하고 있던 오브젝트의 크기를 줄임
+      scaleDown(window.activeMesh);
+      // 기억하고 있던 오브젝트의 active를 false로 만듦
+      window.activeMesh.active = false;
+    }
+    // window.activeMesh한테 이벤트가 일어난 오브젝트를 기억하게 함
+    window.activeMesh = e.object;
+  }
+  const handlePointerEnter = e => {
+    // e.object로 오브젝트에 접근할 수 있다.
+    e.object.scale.x = 1.5;
+    e.object.scale.y = 1.5;
+    e.object.scale.z = 1.5;
+  }
+  const handlePointerLeave = e => {
+    if (!e.object.active) { // 누르면 e.object.active가 true가 되서 안작아짐
+      scaleDown(e.object);
+    }
+  }
+
+  const scaleDown = object => {
+    object.scale.x = 1;
+    object.scale.y = 1;
+    object.scale.z = 1;
+  }
+
   return (
     <mesh
       ref={ref}
       {...props}
       castShadow
-      // receiveShadow
+      onPointerDown={handlePointerDown}
+      onPointerEnter={handlePointerEnter}
+      onPointerLeave={handlePointerLeave}
     >
-      <sphereBufferGeometry />
+      <boxBufferGeometry />
       <meshPhysicalMaterial
         map={texture}
       />
@@ -56,19 +92,13 @@ const Background = props => {
     '/autoshop.jpg'
   );
 
-  // fromEquirectangularTexture()에 필요한 WebGLRenderer를 가지고 옴
   const { gl } = useThree();
 
-  // WebGLCubeRenderTarget을 이용해서 스카이맵을 만들 수 있다.
   const formatted = new THREE.WebGLCubeRenderTarget(
     texture.image.height
-  // fromEquirectangularTexture는 정방형 파노라마를 큐브맵 형식으로 변환할 때 사용한다. 
   ).fromEquirectangularTexture(gl, texture);
 
   return (
-    // primitive는 R3F에서 가장 기본적인 Object와도 같은 놈이다.
-    // object라는 속성을 가지고 있는데 안에 텍스쳐를 넣을 수 있다.
-    // 이것을 Scene의 background 속성으로 넣기 위해선 attach를 이용해야 한다.
     <primitive
       attach="background"
       object={formatted.texture}
@@ -77,7 +107,7 @@ const Background = props => {
 };
 
 const Floor = props => {
-  return(
+  return (
     <mesh {...props} receiveShadow >
       <boxBufferGeometry args={[20, 1, 10]} />
       <meshPhysicalMaterial />
@@ -86,7 +116,7 @@ const Floor = props => {
 };
 
 const Bulb = props => {
-  return(
+  return (
     <mesh {...props}>
       <pointLight castShadow />
       <sphereBufferGeometry args={[0.2, 20, 20]} />
@@ -96,25 +126,58 @@ const Bulb = props => {
 };
 
 function App() {
+  const handleClick = e => {
+    // 만약 선택된 오브젝트가 없다면 색을 입힐 수 없으므로 return;
+    if(!window.activeMesh) return;
+    // object.material.color로 메테리얼의 color속성에 접근할 수 있음
+    // e.target으로 이벤트가 일어난 태그에 접근할 수 있음
+    window.activeMesh.material.color = new THREE.Color(e.target.style.background);
+  }
   return (
     <div style={{ height: '100vh', width: '100vw' }}>
+      <div style={{position: 'absolute', zIndex: 1}}>
+        <div
+          onClick={handleClick}
+          style={{
+            background: 'blue',
+            height: 50,
+            width: 50
+          }}
+        >
+        </div>
+        <div
+          onClick={handleClick}
+          style={{
+            background: 'yellow',
+            height: 50,
+            width: 50
+          }}
+        >
+        </div>
+        <div
+          onClick={handleClick}
+          style={{
+            background: 'white',
+            height: 50,
+            width: 50
+          }}
+        >
+        </div>
+      </div>
       <Canvas
-        // shadows설정을 해줘야 그림자가 생김
         shadows
         style={{ background: 'black' }}
-        camera={{ position: [3, 3, 3] }}
+        camera={{ position: [7, 7, 7] }}
       >
         <ambientLight intensity={0.2} />
         <Bulb position={[0, 3, 0]} />
         <Orbit />
         <axesHelper args={[5]} />
-        <Suspense fallback={null}
-        // Suspense는 기본적으로 구성요소를 렌더링하기 전에
-        // 모든 비동기 동작이 발생할 때까지 기다린다.
-        // 텍스쳐가 로드될 때까지 기다리고 박스를 렌더링함
-        // 현재 버전에선 없어도 무방함
-        >
-          <Box position={[0, 1, 0]} />
+        <Suspense fallback={null}>
+          <Box position={[-4, 1, 0]} />
+        </Suspense>
+        <Suspense fallback={null}>
+          <Box position={[4, 1, 0]} />
         </Suspense>
         <Suspense fallback={null}>
           <Background />
