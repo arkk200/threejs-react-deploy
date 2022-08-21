@@ -29,26 +29,25 @@ const Dragable = props => {
         });
         controlsRef.current.addEventListener('dragstart', e => {
             // 드래그를 시작했을 때 질량을 0으로 만듦
-            e.object.api.mass.set(0);
+            // 옵셔널 체이닝(?.)으로 프로퍼티가 없을 경우 undefined를 반환함
+            e.object.api?.mass.set(0);
         });
         controlsRef.current.addEventListener('dragend', e => {
             // 드래그를 끝냈을 때 질량을 1로 만듦
-            e.object.api.mass.set(1);
+            e.object.api?.mass.set(1);
         });
         controlsRef.current.addEventListener('drag', e => {
             // physics의 위치를 오브젝트의 위치에서 복사해옴
-            e.object.api.position.copy(e.object.position);
+            e.object.api?.position.copy(e.object.position);
             // 드래그하고 있을 땐 속도를 0으로 줄임 (가속하는 버그를 없앰)
-            e.object.api.velocity.set(0, 0, 0);
+            e.object.api?.velocity.set(0, 0, 0);
         });
     }, [children]);
     return (
         <group ref={groupRef}>
-            {/* 컴포넌트로 쓸 수 있게 확장된 것들은 소문자로 시작한다. */}
-            {/* dragControls는 그냥 이벤트를 발생시켜주는 놈이므로
-            group의 자식으로 들어가지 않는다.
-             */}
             <dragControls
+                // trnasformGroup을 true로 하면 모델이 따로 따로 분리되어 움직이지 않는다.
+                transformGroup={props.transformGroup}
                 ref={controlsRef}
                 // dragControls는 드래그할 오브젝트, 카메라, domElement를 인자로 받음
                 args={[children, camera, gl.domElement]}
