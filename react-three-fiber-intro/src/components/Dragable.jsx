@@ -2,7 +2,7 @@ import {
     DragControls
 } from 'three/examples/jsm/controls/DragControls';
 import { useRef } from 'react';
-import { extend, useThree } from 'react-three-fiber';
+import { extend, useThree } from '@react-three/fiber';
 import { useEffect } from 'react';
 import { useState } from 'react';
 
