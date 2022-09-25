@@ -19,18 +19,24 @@ const style = {
 const CameraButtons = ({ }) => {
     // 인자값에 따른 카메라 위치
     const sets = {
+        // model_3 name: "Capot001_CAR_PAINT_0"
         1: {
             cameraPos: [9, 2, 4],
-            target: [4, 0, 0]
+            target: [4, 0, 0],
+            name: "Capot001_CAR_PAINT_0"
         },
+        // model_s name: "object005_bod_0"
         2: {
             cameraPos: [1, 2, 5],
-            target: [-4, 0, 0]
+            target: [-4, 0, 0],
+            name: "object005_bod_0"
         }
     };
     const handleClick = num => {
         state.cameraPos.set(...sets[num].cameraPos);
         state.target.set(...sets[num].target);
+        state.activeMeshName = sets[num].name;
+        // 카메라 버튼이 눌리면 위치가 바껴야 하므로 shouldUpdate를 true로 만듦
         state.shouldUpdate = true;
     }
     return (

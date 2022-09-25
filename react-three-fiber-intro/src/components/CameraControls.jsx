@@ -4,6 +4,12 @@ import * as THREE from 'three';
 
 const CameraControls = ({ }) => {
     useFrame(({ camera, scene }) => {
+        // 한 번만 선택될 수 있도록 조건을 닮
+        if (state.activeMesh.name !== state.activeMeshName) {
+            state.activeMesh = scene.getObjectByName(
+                state.activeMeshName
+            ) || {}
+        }
         if (state.shouldUpdate) {
             // position.lerp로 자연스럽게 바뀌게 만들 수 있음
             // camera 포지션을 매 프레임마다 cameraPos까지의 거리의 10%씩 자연스럽게 움직여서 맞춤
