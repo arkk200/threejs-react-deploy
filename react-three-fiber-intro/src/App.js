@@ -29,6 +29,14 @@ function App() {
         </Suspense>
         <CameraControls />
         <ambientLight intensity={0.2} />
+        <directionalLight 
+          shadow-mapSize-height={2**10}
+          shadow-mapSize-width={2**10}
+          shadow-radius={10}
+          position={[6, 3, 0]}
+          intensity={2}
+          castShadow
+        />
         <Orbit />
         <axesHelper args={[5]} />
         <Bulb position={[-6, 3, 0]} />
