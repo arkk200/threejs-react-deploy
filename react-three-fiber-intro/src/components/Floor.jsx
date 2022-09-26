@@ -8,8 +8,15 @@ const Floor = props => {
     const [ref, api] = useBox(() => ({args: [20, 1, 10], ...props}));
     return (
         <mesh ref={ref} {...props} receiveShadow >
-            <boxBufferGeometry args={[20, 1, 10]} />
-            <meshPhysicalMaterial />
+            <boxBufferGeometry args={[200, 1, 200]} />
+            <meshPhysicalMaterial 
+                transparent
+                opacity={0.2}
+            />
+            {/* <shadowMaterial 
+                // shadowMaterial은 transparent가 기본값으로 적용돼 있다.
+                opacity={0.2}
+            /> */}
         </mesh>
     );
 };
