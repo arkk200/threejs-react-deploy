@@ -12,8 +12,7 @@ import Cars from './components/Cars';
 import CameraControls from './components/CameraControls';
 import CameraButtons from './components/CameraButtons';
 import Lights from './components/Lights';
-// @react-three/postprocessing로 Bloom, Glitch같은 효과를 줄 수 있다.
-import { EffectComposer, DepthOfField, Bloom } from '@react-three/postprocessing';
+import Effects from './components/Effects';
 
 function App() {
   return (
@@ -40,19 +39,7 @@ function App() {
           <Cars />
           <Floor position={[0, -0.5, 0]} />
         </Physics>
-        <EffectComposer>
-          <DepthOfField 
-            focusDistance={0} 
-            focalLength={0.02} 
-            bokehScale={2} 
-            height={480} 
-          />
-          <Bloom 
-            luminanceThreshold={1} 
-            luminanceSmoothing={0.9} 
-            height={300} 
-          />
-        </EffectComposer>
+        <Effects />
       </Canvas>
     </div>
   );
