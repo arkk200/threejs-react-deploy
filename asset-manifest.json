@@ -1,0 +1,15 @@
+{
+  "files": {
+    "main.css": "/threejs-react-deploy/static/css/main.073c9b0a.css",
+    "main.js": "/threejs-react-deploy/static/js/main.01a27396.js",
+    "static/js/787.7271274e.chunk.js": "/threejs-react-deploy/static/js/787.7271274e.chunk.js",
+    "index.html": "/threejs-react-deploy/index.html",
+    "main.073c9b0a.css.map": "/threejs-react-deploy/static/css/main.073c9b0a.css.map",
+    "main.01a27396.js.map": "/threejs-react-deploy/static/js/main.01a27396.js.map",
+    "787.7271274e.chunk.js.map": "/threejs-react-deploy/static/js/787.7271274e.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.073c9b0a.css",
+    "static/js/main.01a27396.js"
+  ]
+}
