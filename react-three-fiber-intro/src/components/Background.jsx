@@ -5,7 +5,7 @@ import { useMemo } from "react";
 const Background = props => {
     const texture = useLoader(
       THREE.TextureLoader,
-      '/autoshop.jpg'
+      process.env.PUBLIC_URL + '/autoshop.jpg' // public폴더 내 이미지를 사용하려면 process.env.PUBLIC_URL를 앞에 붙여야한다.
     );
   
     const { gl } = useThree();

@@ -10,7 +10,7 @@ const Box = props => {
     // useLoader에는 차례대로 THREE의 TextureLoader, 사진 위치가 인자로 들어간다.
     const texture = useLoader(
         THREE.TextureLoader,
-        '/wood.jpg'
+        process.env.PUBLIC_URL + '/wood.jpg'
     );
 
     const handlePointerDown = e => {

@@ -8,7 +8,7 @@ import * as THREE from 'three';
 const Model = props => {
     const model = useLoader(
         GLTFLoader,
-        props.path
+        process.env.PUBLIC_URL + props.path 
     );
     let mixer;
     if(model.animations.length > 0) {
